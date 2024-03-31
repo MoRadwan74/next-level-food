@@ -2,10 +2,14 @@ import Link from "next/link";
 import classes from "./page.module.css";
 import MealsGrid from "@/components/meals/MealsGrid";
 import { getMeals } from "@/lib/meals";
+import { Suspense } from "react";
+
+const Meals = async () => {
+    const meals = await getMeals();
+    return <MealsGrid meals={meals} />;
+};
 
 export default async function MealsPage() {
-    const meals = await getMeals();
-    console.log(meals)
     return (
         <>
             <header className={classes.header}>
@@ -18,7 +22,10 @@ export default async function MealsPage() {
                 </p>
             </header>
             <main className={classes.main}>
-                <MealsGrid meals={meals} />
+                {/* We could use loading.js here to render "Fetching meals..." but it will replace the whole content of this page (e.g., including the header) hence, we leverage the Suspense feature of React to only render a portion of the page instead of the whole one. */}
+                <Suspense fallback={<p className={classes.loading}>Fetching meals...</p>}>
+                    <Meals />
+                </Suspense>
             </main>
         </>
     );
